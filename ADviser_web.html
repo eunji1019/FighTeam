@@ -5,6 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADviser - AI 마케팅 솔루션</title>
     
+    <!-- Platform Data Script (Inline) -->
+    <script>
+        // 플랫폼 및 하위 옵션 데이터
+        const PLATFORM_DATA = [
+            {
+                name: "배달의민족",
+                options: ["배민1플러스", "울트라콜", "우리가게클릭"]
+            },
+            {
+                name: "쿠팡이츠",
+                options: ["스마트요금제", "매출 연동"]
+            },
+            {
+                name: "요기요",
+                options: ["요기요 라이트", "추천광고"]
+            },
+            {
+                name: "네이버",
+                options: ["플레이스 상위 노출", "파워링크", "블로그 마케팅 대행"]
+            },
+            {
+                name: "SNS/커뮤니티",
+                options: ["인스타그램 마케팅 대행", "당근마켓 마케팅 대행", "유튜브 마케팅 대행"]
+            }
+        ];
+
+        // HTML 생성 함수
+        function generatePlatformUI() {
+            return PLATFORM_DATA.map((platform, pIdx) => `
+                <div class="mb-6">
+                    <h3 class="font-bold text-gray-900 mb-3 ml-1">${platform.name}</h3>
+                    <div class="grid grid-cols-1 gap-2">
+                        ${platform.options.map((opt, oIdx) => `
+                            <label class="flex items-center justify-between p-4 border border-gray-200 bg-white rounded-2xl cursor-pointer transition-all" 
+                                   onclick="toggleChannel(this)">
+                                <span class="font-bold text-gray-500">${opt}</span>
+                                <div class="w-6 h-6 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center text-white transition-all">
+                                    <i data-lucide="check" class="w-4 h-4 opacity-0"></i>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
+    
     <!-- Fonts: Pretendard, Russo One, Righteous -->
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Russo+One&display=swap" rel="stylesheet">
@@ -186,7 +233,10 @@
                         <div class="absolute right-0 top-0 w-32 h-32 bg-brand-main opacity-5 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
                         <div class="flex justify-between items-start mb-4 relative z-10">
                             <div>
-                                <p class="text-gray-500 text-xs font-bold uppercase tracking-wide mb-1">이번 달 예-----상상 매출</p>
+
+                                
+                                <p class="text-gray-500 text-xs font-bold uppercase tracking-wide mb-1">이번 달 예상 매출</p>
+ <!-- (플랫폼 선택 옵션 세분화) -->
                                 <h2 class="text-4xl font-black text-gray-900 tracking-tight">12,450,000원</h2>
                             </div>
                             <span class="bg-blue-50 text-brand-main text-xs font-bold px-2.5 py-1.5 rounded-xl flex items-center gap-1">
@@ -672,32 +722,9 @@
     </div>
 
     <!-- Lifetime Free Modal -->
-    <div id="lifetime-free-modal" class="fixed inset-0 z-[75] hidden flex items-center justify-center px-6">
-        <div class="absolute inset-0 bg-black/60 backdrop-blur-md animate-fade-in"></div>
-        <div class="relative bg-white rounded-[2.5rem] p-8 md:p-10 w-full max-w-sm md:max-w-lg text-center animate-slide-up shadow-2xl">
-            <div class="absolute top-6 right-6">
-                <button onclick="closeLifetimeFreeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
-            </div>
+
             
-            <div class="mt-4 mb-6">
-                <div class="w-20 h-20 bg-gradient-to-br from-brand-main to-[#7C8AFF] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-blue-500/30">
-                    <i data-lucide="gift" class="w-10 h-10 text-white"></i>
-                </div>
-                <h2 class="text-2xl font-black text-gray-900 mb-3 leading-tight">
-                    <span id="lifetime-free-name">김애드님</span>은<br>
-                    오늘부터
-                </h2>
-                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-2xl p-4 mb-4">
-                    <p class="text-lg font-black text-gray-900 leading-relaxed">
-                        마케팅 <span class="text-brand-main">분석</span><br>
-                        <span class="text-status-warning">진단</span><br>
-                        <span class="text-status-success">행동 솔루션</span><br>
-                        <span class="text-yellow-600 text-xl">평생 무료</span>입니다
-                    </p>
-                </div>
-            </div>
+          
             
             <div class="space-y-3 mb-6">
                 <div class="flex items-center justify-center gap-2 text-sm text-gray-600">
@@ -1323,38 +1350,29 @@
             let html = '';
 
             // --- STEP 0: Channel Select ---
-            if (step === 0) {
-                html = `
-                    <div class="animate-fade-in space-y-8">
-                        <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-2xl p-4 mb-4">
-                            <div class="flex items-center gap-2 mb-2">
-                                <i data-lucide="gift" class="w-5 h-5 text-yellow-600"></i>
-                                <span class="text-sm font-black text-yellow-700">초기 고객 확보 특별 혜택</span>
-                            </div>
-                            <p class="text-xs text-gray-700 font-bold leading-relaxed">분석 → 진단 → 행동 솔루션까지 <span class="text-yellow-600 text-sm">100% 무료</span>로 제공합니다</p>
-                        </div>
-                        <div>
-                            <h2 class="text-2xl font-black text-gray-900 mb-2">어떤 광고를 분석할까요?</h2>
-                            <p class="text-gray-500 text-sm">이용 중인 플랫폼을 모두 선택해주세요.</p>
-                        </div>
-                        <div class="space-y-3">
-                            <label class="flex items-center justify-between p-4 border-2 border-brand-main bg-blue-50 rounded-2xl cursor-pointer transition-all" onclick="toggleChannel(this)">
-                                <span class="font-bold text-gray-900">배달의민족</span>
-                                <div class="w-6 h-6 bg-brand-main rounded-full flex items-center justify-center text-white transition-all"><i data-lucide="check" class="w-4 h-4"></i></div>
-                            </label>
-                            <label class="flex items-center justify-between p-4 border border-gray-200 bg-white rounded-2xl cursor-pointer transition-all" onclick="toggleChannel(this)">
-                                <span class="font-bold text-gray-500">쿠팡이츠</span>
-                                <div class="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center text-white border border-gray-200 transition-all"><i data-lucide="check" class="w-4 h-4"></i></div>
-                            </label>
-                            <label class="flex items-center justify-between p-4 border-2 border-brand-main bg-blue-50 rounded-2xl cursor-pointer transition-all" onclick="toggleChannel(this)">
-                                <span class="font-bold text-gray-900">네이버 플레이스</span>
-                                <div class="w-6 h-6 bg-brand-main rounded-full flex items-center justify-center text-white transition-all"><i data-lucide="check" class="w-4 h-4"></i></div>
-                            </label>
-                        </div>
-                        <button onclick="renderFlowStep(1)" class="w-full bg-gray-200 text-gray-500 py-4 rounded-2xl font-bold text-lg mt-10 hover:bg-brand-main hover:text-white transition-all btn-press">다음</button>
-                    </div>
-                `;
-            }
+if (step === 0) {
+    html = `
+        <div class="animate-fade-in space-y-8">
+            <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-300 rounded-2xl p-4 mb-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <i data-lucide="gift" class="w-5 h-5 text-yellow-600"></i>
+                    <span class="text-sm font-black text-yellow-700">초기 고객 확보 특별 혜택</span>
+                </div>
+                <p class="text-xs text-gray-700 font-bold leading-relaxed">분석 → 진단 → 행동 솔루션까지 <span class="text-yellow-600 text-sm">100% 무료</span>로 제공합니다</p>
+            </div>
+            <div>
+                <h2 class="text-2xl font-black text-gray-900 mb-2">어떤 광고를 분석할까요?</h2>
+                <p class="text-gray-500 text-sm">이용 중인 광고 상품을 모두 선택해주세요.</p>
+            </div>
+            
+            <div class="space-y-4">
+                ${generatePlatformUI()}
+            </div>
+
+            <button onclick="renderFlowStep(1)" class="w-full bg-brand-main text-white py-4 rounded-2xl font-bold text-lg mt-10 btn-press shadow-lg">다음</button>
+        </div>
+    `;
+}
             
             // --- STEP 1: Upload (OCR) ---
             else if (step === 1) {
