@@ -39,7 +39,7 @@
                     <div class="grid grid-cols-1 gap-2">
                         ${platform.options.map((opt, oIdx) => `
                             <label class="flex items-center justify-between p-4 border border-gray-200 bg-white rounded-2xl cursor-pointer transition-all" 
-                                   onclick="toggleChannel(this)">
+                                   onclick="toggleChannel(this, event)">
                                 <span class="font-bold text-gray-500">${opt}</span>
                                 <div class="w-6 h-6 bg-gray-100 border border-gray-200 rounded-full flex items-center justify-center text-white transition-all">
                                     <i data-lucide="check" class="w-4 h-4 opacity-0"></i>
@@ -50,6 +50,8 @@
                 </div>
             `).join('');
         }
+
+        // 채널 토글 함수는 나중에 전역 변수 선언 후에 정의됩니다
     </script>
     
     <!-- Fonts: Pretendard, Russo One, Righteous -->
@@ -788,14 +790,107 @@
         </div>
     </div>
 
+    <!-- Main Application Script -->
     <script>
-        // --- Global State ---
+        // 전역 상태 관리
         let currentStep = 0;
         let analysisChartInstance = null;
         let salesChart = null;
         let currentXP = 1450;
         const maxXP = 2000;
         let provocativeShown = false;
+        let selectedChannels = [];
+        let ocrDataArray = [];
+        let ocrData = {
+            impression: null,
+            click: null,
+            conversion: null
+        };
+
+        // 채널 토글 함수 (전역 변수 선언 후 정의)
+        window.toggleChannel = function(el, event) {
+            // event 객체 처리
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            } else if (window.event) {
+                window.event.preventDefault();
+                window.event.stopPropagation();
+            }
+
+            // 요소 존재 확인
+            if (!el) {
+                console.error('toggleChannel: el이 null입니다.');
+                return;
+            }
+
+            const checkbox = el.querySelector('.w-6');
+            if (!checkbox) {
+                console.error('toggleChannel: checkbox를 찾을 수 없습니다.', el);
+                return;
+            }
+
+            // Lucide가 <i>를 <svg>로 변환하므로 둘 다 찾기
+            const icon = checkbox.querySelector('i') || checkbox.querySelector('svg');
+            if (!icon) {
+                console.error('toggleChannel: icon을 찾을 수 없습니다.', checkbox);
+                return;
+            }
+
+            const text = el.querySelector('span');
+            if (!text) {
+                console.error('toggleChannel: text를 찾을 수 없습니다.', el);
+                return;
+            }
+
+            const channelName = text.textContent.trim();
+            
+            console.log('toggleChannel 호출됨, 채널명:', channelName);
+            console.log('현재 selectedChannels:', selectedChannels);
+            
+            // Check current state by border color
+            if (el.classList.contains('border-brand-main')) {
+                // Uncheck
+                el.classList.remove('border-brand-main', 'bg-blue-50', 'border-2');
+                el.classList.add('border-gray-200', 'bg-white', 'border');
+                
+                checkbox.classList.remove('bg-brand-main', 'border-transparent');
+                checkbox.classList.add('bg-gray-100', 'border-gray-200', 'border');
+                
+                icon.classList.add('opacity-0');
+                
+                text.classList.remove('text-gray-900');
+                text.classList.add('text-gray-500');
+                
+                // 선택된 채널에서 제거
+                selectedChannels = selectedChannels.filter(name => name !== channelName);
+            } else {
+                // Check
+                el.classList.remove('border-gray-200', 'bg-white', 'border');
+                el.classList.add('border-brand-main', 'bg-blue-50', 'border-2');
+                
+                checkbox.classList.remove('bg-gray-100', 'border-gray-200', 'border');
+                checkbox.classList.add('bg-brand-main', 'border-transparent');
+                
+                icon.classList.remove('opacity-0');
+                
+                text.classList.remove('text-gray-500');
+                text.classList.add('text-gray-900');
+                
+                // 선택된 채널에 추가
+                if (!selectedChannels.includes(channelName)) {
+                    selectedChannels.push(channelName);
+                }
+            }
+            
+            console.log('선택된 채널:', selectedChannels);
+            console.log('selectedChannels.length:', selectedChannels.length);
+            
+            // 아이콘 업데이트
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        };
 
         // --- AI Reply System ---
         // Ensure this function is available globally
@@ -1330,6 +1425,8 @@
         // --- Core Flow Logic (Analysis -> Diagnosis -> Action) ---
         function resetFlow() {
             currentStep = 0;
+            selectedChannels = [];
+            ocrDataArray = [];
             ocrData = { impression: null, click: null, conversion: null };
             renderFlowStep(0);
         }
@@ -1369,71 +1466,148 @@ if (step === 0) {
                 ${generatePlatformUI()}
             </div>
 
-            <button onclick="renderFlowStep(1)" class="w-full bg-brand-main text-white py-4 rounded-2xl font-bold text-lg mt-10 btn-press shadow-lg">다음</button>
+            <button onclick="if(selectedChannels.length === 0) { alert('최소 1개 이상의 채널을 선택해주세요.'); } else { renderFlowStep(1); }" class="w-full bg-brand-main text-white py-4 rounded-2xl font-bold text-lg mt-10 btn-press shadow-lg">다음</button>
         </div>
     `;
 }
             
-            // --- STEP 1: Upload (OCR) ---
+            // --- STEP 1: Upload (OCR) - 여러 채널 지원 ---
             else if (step === 1) {
+                // 디버깅: selectedChannels 확인
+                console.log('STEP 1 진입 - selectedChannels:', selectedChannels);
+                console.log('selectedChannels.length:', selectedChannels.length);
+                
+                // selectedChannels가 비어있으면 경고
+                if (selectedChannels.length === 0) {
+                    console.warn('선택된 채널이 없습니다. STEP 0으로 돌아가서 채널을 선택해주세요.');
+                    alert('채널을 선택해주세요. 이전 단계로 돌아갑니다.');
+                    renderFlowStep(0);
+                    return;
+                }
+                
+                // ocrDataArray 초기화 (선택된 채널 수만큼)
+                ocrDataArray = new Array(selectedChannels.length).fill(null);
+                
+                const channelCount = selectedChannels.length;
                 html = `
                     <div class="animate-fade-in space-y-8">
                         <div>
                             <h2 class="text-2xl font-black text-gray-900 mb-2">데이터 입력</h2>
-                            <p class="text-gray-500 text-sm">관리자 페이지 화면을 캡처해서 올려주세요.<br>AI가 숫자를 자동으로 읽어옵니다.</p>
+                            <p class="text-gray-500 text-sm">선택하신 ${channelCount}개 채널의 관리자 페이지 화면을 캡처해서 올려주세요.<br>AI가 숫자를 자동으로 읽어옵니다.</p>
                         </div>
-                        <div class="relative">
-                            <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
-                            <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[2rem] min-h-64 flex flex-col items-center justify-center bg-gray-50 relative overflow-hidden group cursor-pointer hover:border-brand-main transition-colors" 
-                                 onclick="document.getElementById('image-upload').click()"
-                                 ondrop="handleDrop(event)" 
-                                 ondragover="handleDragOver(event)" 
-                                 ondragleave="handleDragLeave(event)">
-                                <div id="ocr-placeholder" class="flex flex-col items-center p-8">
-                                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform">
-                                        <i data-lucide="camera" class="w-8 h-8 text-gray-400"></i>
+                        
+                        <div class="space-y-4" id="upload-containers">
+                            ${selectedChannels.length > 0 ? selectedChannels.map((channelName, index) => `
+                                <div class="upload-item" data-channel-index="${index}">
+                                    <div class="mb-2">
+                                        <span class="text-sm font-bold text-gray-700">${channelName}</span>
+                                        <span class="text-xs text-gray-500 ml-2">(${index + 1}/${channelCount})</span>
                                     </div>
-                                    <p class="text-sm font-bold text-gray-400 mb-2">사진 촬영 또는 앨범 선택</p>
-                                    <span class="text-[10px] bg-gray-200 text-gray-500 px-2 py-1 rounded font-bold">OCR 자동 인식</span>
-                                    <p class="text-xs text-gray-400 mt-4">JPG, PNG, WEBP 형식 지원</p>
-                                </div>
-                                <div id="ocr-preview" class="hidden w-full p-4">
-                                    <img id="preview-image" src="" alt="업로드된 이미지" class="w-full max-h-64 object-contain rounded-xl mb-4">
-                                    <button onclick="document.getElementById('image-upload').click()" class="w-full bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">
-                                        다른 이미지 선택
-                                    </button>
-                                </div>
-                                <div id="ocr-loading" class="absolute inset-0 bg-black/70 backdrop-blur-sm hidden flex flex-col items-center justify-center z-10 rounded-[2rem]">
-                                    <div class="w-full absolute top-0 h-1 bg-green-400 shadow-[0_0_15px_#4ade80] animate-scan"></div>
-                                    <div class="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
-                                    <p class="text-white font-bold text-lg mb-2 animate-pulse">이미지 분석 중...</p>
-                                    <p id="ocr-progress" class="text-white/80 text-sm">OCR 엔진 로딩 중...</p>
-                                </div>
-                                <div id="ocr-result" class="hidden w-full p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
-                                    <div class="flex items-center gap-2 mb-4 text-green-600 font-bold">
-                                        <i data-lucide="check-circle" class="w-5 h-5"></i>
-                                        <span>인식 완료</span>
+                                    <div class="relative">
+                                        <input type="file" id="image-upload-${index}" accept="image/*" class="hidden" onchange="handleImageUpload(event, ${index}, '${channelName}')">
+                                        <div id="upload-area-${index}" class="border-2 border-dashed border-gray-300 rounded-[2rem] min-h-48 flex flex-col items-center justify-center bg-gray-50 relative overflow-hidden group cursor-pointer hover:border-brand-main transition-colors" 
+                                             onclick="document.getElementById('image-upload-${index}').click()"
+                                             ondrop="handleDrop(event, ${index}, '${channelName}')" 
+                                             ondragover="handleDragOver(event, ${index})" 
+                                             ondragleave="handleDragLeave(event, ${index})">
+                                            <div id="ocr-placeholder-${index}" class="flex flex-col items-center p-6">
+                                                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-3 group-hover:scale-110 transition-transform">
+                                                    <i data-lucide="camera" class="w-6 h-6 text-gray-400"></i>
+                                                </div>
+                                                <p class="text-xs font-bold text-gray-400 mb-1">사진 촬영 또는 앨범 선택</p>
+                                                <span class="text-[10px] bg-gray-200 text-gray-500 px-2 py-0.5 rounded font-bold">OCR 자동 인식</span>
+                                            </div>
+                                            <div id="ocr-preview-${index}" class="hidden w-full p-3">
+                                                <img id="preview-image-${index}" src="" alt="업로드된 이미지" class="w-full max-h-48 object-contain rounded-xl mb-2">
+                                                <button onclick="document.getElementById('image-upload-${index}').click()" class="w-full bg-gray-100 text-gray-600 py-1.5 rounded-lg text-xs font-bold hover:bg-gray-200 transition-colors">
+                                                    다른 이미지 선택
+                                                </button>
+                                            </div>
+                                            <div id="ocr-loading-${index}" class="absolute inset-0 bg-black/70 backdrop-blur-sm hidden flex flex-col items-center justify-center z-10 rounded-[2rem]">
+                                                <div class="w-full absolute top-0 h-1 bg-green-400 shadow-[0_0_15px_#4ade80] animate-scan"></div>
+                                                <div class="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin mb-3"></div>
+                                                <p class="text-white font-bold text-sm mb-1 animate-pulse">이미지 분석 중...</p>
+                                                <p id="ocr-progress-${index}" class="text-white/80 text-xs">OCR 엔진 로딩 중...</p>
+                                            </div>
+                                            <div id="ocr-result-${index}" class="hidden w-full p-4 bg-white rounded-xl border border-gray-200 shadow-lg">
+                                                <div class="flex items-center gap-2 mb-3 text-green-600 font-bold text-sm">
+                                                    <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                                    <span>인식 완료</span>
+                                                </div>
+                                                <div class="space-y-2">
+                                                    <div class="flex justify-between items-center p-2 bg-blue-50 rounded-lg border border-blue-100">
+                                                        <span class="text-gray-600 font-medium text-xs">노출수</span>
+                                                        <span id="ocr-impression-${index}" class="text-lg font-black text-brand-main">-</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center p-2 bg-purple-50 rounded-lg border border-purple-100">
+                                                        <span class="text-gray-600 font-medium text-xs">클릭수</span>
+                                                        <span id="ocr-click-${index}" class="text-lg font-black text-purple-600">-</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center p-2 bg-green-50 rounded-lg border border-green-100">
+                                                        <span class="text-gray-600 font-medium text-xs">전환수</span>
+                                                        <span id="ocr-conversion-${index}" class="text-lg font-black text-green-600">-</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="space-y-3">
-                                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
-                                            <span class="text-gray-600 font-medium">노출수 (Impression)</span>
-                                            <span id="ocr-impression" class="text-xl font-black text-brand-main">-</span>
+                                </div>
+                            `).join('') : `
+                                <div class="relative">
+                                    <input type="file" id="image-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                    <div id="upload-area" class="border-2 border-dashed border-gray-300 rounded-[2rem] min-h-64 flex flex-col items-center justify-center bg-gray-50 relative overflow-hidden group cursor-pointer hover:border-brand-main transition-colors" 
+                                         onclick="document.getElementById('image-upload').click()"
+                                         ondrop="handleDrop(event)" 
+                                         ondragover="handleDragOver(event)" 
+                                         ondragleave="handleDragLeave(event)">
+                                        <div id="ocr-placeholder" class="flex flex-col items-center p-8">
+                                            <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-sm mb-4 group-hover:scale-110 transition-transform">
+                                                <i data-lucide="camera" class="w-8 h-8 text-gray-400"></i>
+                                            </div>
+                                            <p class="text-sm font-bold text-gray-400 mb-2">사진 촬영 또는 앨범 선택</p>
+                                            <span class="text-[10px] bg-gray-200 text-gray-500 px-2 py-1 rounded font-bold">OCR 자동 인식</span>
+                                            <p class="text-xs text-gray-400 mt-4">JPG, PNG, WEBP 형식 지원</p>
                                         </div>
-                                        <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg border border-purple-100">
-                                            <span class="text-gray-600 font-medium">클릭수 (Click)</span>
-                                            <span id="ocr-click" class="text-xl font-black text-purple-600">-</span>
+                                        <div id="ocr-preview" class="hidden w-full p-4">
+                                            <img id="preview-image" src="" alt="업로드된 이미지" class="w-full max-h-64 object-contain rounded-xl mb-4">
+                                            <button onclick="document.getElementById('image-upload').click()" class="w-full bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">
+                                                다른 이미지 선택
+                                            </button>
                                         </div>
-                                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
-                                            <span class="text-gray-600 font-medium">전환수 (Conversion)</span>
-                                            <span id="ocr-conversion" class="text-xl font-black text-green-600">-</span>
+                                        <div id="ocr-loading" class="absolute inset-0 bg-black/70 backdrop-blur-sm hidden flex flex-col items-center justify-center z-10 rounded-[2rem]">
+                                            <div class="w-full absolute top-0 h-1 bg-green-400 shadow-[0_0_15px_#4ade80] animate-scan"></div>
+                                            <div class="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4"></div>
+                                            <p class="text-white font-bold text-lg mb-2 animate-pulse">이미지 분석 중...</p>
+                                            <p id="ocr-progress" class="text-white/80 text-sm">OCR 엔진 로딩 중...</p>
+                                        </div>
+                                        <div id="ocr-result" class="hidden w-full p-6 bg-white rounded-xl border border-gray-200 shadow-lg">
+                                            <div class="flex items-center gap-2 mb-4 text-green-600 font-bold">
+                                                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                                                <span>인식 완료</span>
+                                            </div>
+                                            <div class="space-y-3">
+                                                <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg border border-blue-100">
+                                                    <span class="text-gray-600 font-medium">노출수 (Impression)</span>
+                                                    <span id="ocr-impression" class="text-xl font-black text-brand-main">-</span>
+                                                </div>
+                                                <div class="flex justify-between items-center p-3 bg-purple-50 rounded-lg border border-purple-100">
+                                                    <span class="text-gray-600 font-medium">클릭수 (Click)</span>
+                                                    <span id="ocr-click" class="text-xl font-black text-purple-600">-</span>
+                                                </div>
+                                                <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg border border-green-100">
+                                                    <span class="text-gray-600 font-medium">전환수 (Conversion)</span>
+                                                    <span id="ocr-conversion" class="text-xl font-black text-green-600">-</span>
+                                                </div>
+                                            </div>
+                                            <button onclick="document.getElementById('image-upload').click()" class="w-full mt-4 bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">
+                                                다시 분석하기
+                                            </button>
                                         </div>
                                     </div>
-                                    <button onclick="document.getElementById('image-upload').click()" class="w-full mt-4 bg-gray-100 text-gray-600 py-2 rounded-lg text-sm font-bold hover:bg-gray-200 transition-colors">
-                                        다시 분석하기
-                                    </button>
                                 </div>
-                            </div>
+                            `}
                         </div>
+                        
                         <button id="btn-analyze" onclick="proceedToAnalysis()" class="w-full bg-gray-200 text-gray-500 py-4 rounded-2xl font-bold text-lg transition-all hidden hover:bg-brand-main hover:text-white btn-press">분석 시작하기</button>
                     </div>
                 `;
@@ -1875,52 +2049,9 @@ if (step === 0) {
             lucide.createIcons();
         }
 
-        // --- Helpers ---
-        function toggleChannel(el) {
-            // Prevent bubbling if clicking inner elements
-            event.preventDefault();
-            event.stopPropagation();
-
-            const checkbox = el.querySelector('.w-6');
-            const icon = checkbox.querySelector('i');
-            const text = el.querySelector('span');
-            
-            // Check current state by border color
-            if (el.classList.contains('border-brand-main')) {
-                // Uncheck
-                el.classList.remove('border-brand-main', 'bg-blue-50', 'border-2');
-                el.classList.add('border-gray-200', 'bg-white', 'border');
-                
-                checkbox.classList.remove('bg-brand-main', 'border-transparent');
-                checkbox.classList.add('bg-gray-100', 'border-gray-200', 'border');
-                
-                icon.classList.add('opacity-0');
-                
-                text.classList.remove('text-gray-900');
-                text.classList.add('text-gray-500');
-            } else {
-                // Check
-                el.classList.remove('border-gray-200', 'bg-white', 'border');
-                el.classList.add('border-brand-main', 'bg-blue-50', 'border-2');
-                
-                checkbox.classList.remove('bg-gray-100', 'border-gray-200', 'border');
-                checkbox.classList.add('bg-brand-main', 'border-transparent');
-                
-                icon.classList.remove('opacity-0');
-                
-                text.classList.remove('text-gray-500');
-                text.classList.add('text-gray-900');
-            }
-        }
-
         // --- OCR Image Upload Handler ---
-        let ocrData = {
-            impression: null,
-            click: null,
-            conversion: null
-        };
 
-        async function handleImageUpload(event) {
+        async function handleImageUpload(event, channelIndex = null, channelName = null) {
             const file = event.target.files[0];
             if (!file) return;
 
@@ -1930,32 +2061,51 @@ if (step === 0) {
                 return;
             }
 
-            // Show preview
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewImg = document.getElementById('preview-image');
-                const placeholder = document.getElementById('ocr-placeholder');
-                const preview = document.getElementById('ocr-preview');
-                const result = document.getElementById('ocr-result');
-                
-                if (previewImg) {
-                    previewImg.src = e.target.result;
-                    placeholder.classList.add('hidden');
-                    preview.classList.remove('hidden');
-                    result.classList.add('hidden');
-                }
-            };
-            reader.readAsDataURL(file);
-
-            // Start OCR
-            await performOCR(file);
+            // 여러 채널 지원
+            if (channelIndex !== null && channelName !== null) {
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImg = document.getElementById(`preview-image-${channelIndex}`);
+                    const placeholder = document.getElementById(`ocr-placeholder-${channelIndex}`);
+                    const preview = document.getElementById(`ocr-preview-${channelIndex}`);
+                    const result = document.getElementById(`ocr-result-${channelIndex}`);
+                    
+                    if (previewImg) {
+                        previewImg.src = e.target.result;
+                        placeholder.classList.add('hidden');
+                        preview.classList.remove('hidden');
+                        result.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+                await performOCR(file, channelIndex, channelName);
+            } else {
+                // 단일 이미지 업로드 (기존 방식)
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const previewImg = document.getElementById('preview-image');
+                    const placeholder = document.getElementById('ocr-placeholder');
+                    const preview = document.getElementById('ocr-preview');
+                    const result = document.getElementById('ocr-result');
+                    
+                    if (previewImg) {
+                        previewImg.src = e.target.result;
+                        placeholder.classList.add('hidden');
+                        preview.classList.remove('hidden');
+                        result.classList.add('hidden');
+                    }
+                };
+                reader.readAsDataURL(file);
+                await performOCR(file);
+            }
         }
 
-        async function performOCR(imageFile) {
-            const loading = document.getElementById('ocr-loading');
-            const progress = document.getElementById('ocr-progress');
-            const result = document.getElementById('ocr-result');
-            const preview = document.getElementById('ocr-preview');
+        async function performOCR(imageFile, channelIndex = null, channelName = null) {
+            const loading = document.getElementById(channelIndex !== null ? `ocr-loading-${channelIndex}` : 'ocr-loading');
+            const progress = document.getElementById(channelIndex !== null ? `ocr-progress-${channelIndex}` : 'ocr-progress');
+            const result = document.getElementById(channelIndex !== null ? `ocr-result-${channelIndex}` : 'ocr-result');
+            const preview = document.getElementById(channelIndex !== null ? `ocr-preview-${channelIndex}` : 'ocr-preview');
             const btn = document.getElementById('btn-analyze');
 
             // Show loading
@@ -2005,61 +2155,83 @@ if (step === 0) {
                 // Extract numbers from OCR text with improved logic
                 const extractedData = extractNumbersFromText(text, words);
                 
+                // 여러 채널 지원
+                if (channelIndex !== null && channelName !== null) {
+                    // 채널별 데이터 저장
+                    ocrDataArray[channelIndex] = {
+                        channelName: channelName,
+                        impression: extractedData.impression,
+                        click: extractedData.click,
+                        conversion: extractedData.conversion
+                    };
+                    
+                    // UI 업데이트
+                    const impressionEl = document.getElementById(`ocr-impression-${channelIndex}`);
+                    const clickEl = document.getElementById(`ocr-click-${channelIndex}`);
+                    const conversionEl = document.getElementById(`ocr-conversion-${channelIndex}`);
+                    
+                    if (impressionEl) {
+                        impressionEl.textContent = extractedData.impression ? extractedData.impression.toLocaleString() : '-';
+                    }
+                    if (clickEl) {
+                        clickEl.textContent = extractedData.click ? extractedData.click.toLocaleString() : '-';
+                    }
+                    if (conversionEl) {
+                        conversionEl.textContent = extractedData.conversion ? extractedData.conversion.toLocaleString() : '-';
+                    }
+                    
+                    // 모든 채널의 데이터가 준비되었는지 확인
+                    const allReady = selectedChannels.length > 0 && 
+                                     ocrDataArray.length === selectedChannels.length && 
+                                     ocrDataArray.every((data, idx) => {
+                                         // null이 아니고, impression 또는 click이 있어야 함
+                                         return data !== null && data !== undefined && (data.impression || data.click);
+                                     });
+                    
+                    if (btn && allReady) {
+                        btn.classList.remove('hidden', 'bg-gray-200', 'text-gray-500');
+                        btn.classList.add('bg-brand-main', 'text-white', 'shadow-lg');
+                    } else if (btn && !allReady) {
+                        // 일부 채널만 완료된 경우 버튼은 보이지만 비활성화 상태 유지
+                        console.log('대기 중인 채널:', selectedChannels.length - ocrDataArray.filter(d => d && (d.impression || d.click)).length);
+                    }
+                } else {
+                    // 단일 이미지 업로드 (기존 방식)
+                    ocrData.impression = extractedData.impression;
+                    ocrData.click = extractedData.click;
+                    ocrData.conversion = extractedData.conversion;
+                    
+                    const impressionEl = document.getElementById('ocr-impression');
+                    const clickEl = document.getElementById('ocr-click');
+                    const conversionEl = document.getElementById('ocr-conversion');
+                    
+                    if (impressionEl) {
+                        impressionEl.textContent = extractedData.impression ? extractedData.impression.toLocaleString() : '-';
+                    }
+                    if (clickEl) {
+                        clickEl.textContent = extractedData.click ? extractedData.click.toLocaleString() : '-';
+                    }
+                    if (conversionEl) {
+                        conversionEl.textContent = extractedData.conversion ? extractedData.conversion.toLocaleString() : '-';
+                    }
+                    
+                    if (btn && (extractedData.impression || extractedData.click || extractedData.conversion)) {
+                        btn.classList.remove('hidden', 'bg-gray-200', 'text-gray-500');
+                        btn.classList.add('bg-brand-main', 'text-white', 'shadow-lg');
+                    }
+                }
+                
                 // Update UI
                 loading.classList.add('hidden');
                 loading.classList.remove('flex');
-                
-                // Always show result, even if some values are missing
                 result.classList.remove('hidden');
                 
-                // Update result display with actual extracted data
-                const impressionEl = document.getElementById('ocr-impression');
-                const clickEl = document.getElementById('ocr-click');
-                const conversionEl = document.getElementById('ocr-conversion');
-                
-                // Store extracted data in global variable
-                ocrData.impression = extractedData.impression;
-                ocrData.click = extractedData.click;
-                ocrData.conversion = extractedData.conversion;
-                
-                console.log('OCR 데이터 저장됨:', ocrData);
-                
-                // Update UI with actual values
-                if (impressionEl) {
-                    impressionEl.textContent = extractedData.impression ? extractedData.impression.toLocaleString() : '-';
-                }
-                if (clickEl) {
-                    clickEl.textContent = extractedData.click ? extractedData.click.toLocaleString() : '-';
-                }
-                if (conversionEl) {
-                    conversionEl.textContent = extractedData.conversion ? extractedData.conversion.toLocaleString() : '-';
+                if (progress) {
+                    progress.textContent = '✅ 인식 완료!';
+                    progress.classList.add('text-green-400');
                 }
                 
-                // Show analyze button if at least one value is extracted
-                if (btn && (extractedData.impression || extractedData.click || extractedData.conversion)) {
-                    btn.classList.remove('hidden', 'bg-gray-200', 'text-gray-500');
-                    btn.classList.add('bg-brand-main', 'text-white', 'shadow-lg');
-                    
-                    // Show success message
-                    if (progress) {
-                        progress.textContent = '✅ 인식 완료!';
-                        progress.classList.add('text-green-400');
-                    }
-                    } else {
-                        // If no data extracted, show manual input option
-                        console.warn('OCR 데이터 추출 실패 - 수동 입력 필요');
-                        if (progress) {
-                            progress.textContent = '⚠️ 일부 데이터를 인식하지 못했습니다.';
-                        }
-                        setTimeout(() => {
-                            if (!ocrData.impression && !ocrData.click) {
-                                showManualInput();
-                            }
-                        }, 1000);
-                    }
-                    
-                    // Force UI update
-                    console.log('OCR 데이터 최종 저장:', ocrData);
+                console.log('OCR 데이터 저장됨:', channelIndex !== null ? ocrDataArray[channelIndex] : ocrData);
 
                 lucide.createIcons();
             } catch (error) {
@@ -2267,8 +2439,15 @@ if (step === 0) {
         }
 
         function proceedToAnalysis() {
-            // Validate OCR data
-            console.log('분석 시작 - OCR 데이터 확인:', ocrData);
+            // 여러 채널 데이터 합산
+            if (ocrDataArray.length > 0) {
+                ocrData.impression = ocrDataArray.reduce((sum, data) => sum + (data?.impression || 0), 0);
+                ocrData.click = ocrDataArray.reduce((sum, data) => sum + (data?.click || 0), 0);
+                ocrData.conversion = ocrDataArray.reduce((sum, data) => sum + (data?.conversion || 0), 0);
+            }
+            
+            console.log('분석 시작 - 통합 OCR 데이터:', ocrData);
+            console.log('채널별 데이터:', ocrDataArray);
             
             if (!ocrData.impression && !ocrData.click) {
                 alert('노출수 또는 클릭수 데이터가 필요합니다. 이미지를 업로드해주세요.');
@@ -2286,29 +2465,29 @@ if (step === 0) {
         }
 
         // --- Drag and Drop Handlers ---
-        function handleDragOver(event) {
+        function handleDragOver(event, channelIndex = null) {
             event.preventDefault();
             event.stopPropagation();
-            const uploadArea = document.getElementById('upload-area');
+            const uploadArea = document.getElementById(channelIndex !== null ? `upload-area-${channelIndex}` : 'upload-area');
             if (uploadArea) {
                 uploadArea.classList.add('border-brand-main', 'bg-blue-50');
             }
         }
 
-        function handleDragLeave(event) {
+        function handleDragLeave(event, channelIndex = null) {
             event.preventDefault();
             event.stopPropagation();
-            const uploadArea = document.getElementById('upload-area');
+            const uploadArea = document.getElementById(channelIndex !== null ? `upload-area-${channelIndex}` : 'upload-area');
             if (uploadArea) {
                 uploadArea.classList.remove('border-brand-main', 'bg-blue-50');
             }
         }
 
-        function handleDrop(event) {
+        function handleDrop(event, channelIndex = null, channelName = null) {
             event.preventDefault();
             event.stopPropagation();
             
-            const uploadArea = document.getElementById('upload-area');
+            const uploadArea = document.getElementById(channelIndex !== null ? `upload-area-${channelIndex}` : 'upload-area');
             if (uploadArea) {
                 uploadArea.classList.remove('border-brand-main', 'bg-blue-50');
             }
@@ -2317,13 +2496,21 @@ if (step === 0) {
             if (files.length > 0) {
                 const file = files[0];
                 if (file.type.match('image.*')) {
-                    // Create a fake event object for handleImageUpload
-                    const fakeEvent = {
-                        target: {
-                            files: [file]
-                        }
-                    };
-                    handleImageUpload(fakeEvent);
+                    if (channelIndex !== null && channelName !== null) {
+                        const fakeEvent = {
+                            target: {
+                                files: [file]
+                            }
+                        };
+                        handleImageUpload(fakeEvent, channelIndex, channelName);
+                    } else {
+                        const fakeEvent = {
+                            target: {
+                                files: [file]
+                            }
+                        };
+                        handleImageUpload(fakeEvent);
+                    }
                 } else {
                     alert('이미지 파일만 업로드 가능합니다.');
                 }
