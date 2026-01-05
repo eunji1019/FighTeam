@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/favicon_3.png" />
+  <title>수익성 개선을 위한 AI 맞춤 솔루션 - ADviser</title>
+  
+  <!-- Fonts: Pretendard, Russo One, Righteous -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Russo+One&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Pretendard', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              dark: '#0F1D41',
+              main: '#2546A3',
+              light: '#7C8AFF',
+              bg: '#EEF2FA',
+            },
+            status: {
+              danger: '#FF4D4D',
+              warning: '#FFB800',
+              success: '#10B981',
+            }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.4s ease-out forwards',
+            'slide-up': 'slideUp 0.4s ease-out forwards',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { transform: 'translateY(20px)', opacity: '0' }, '100%': { transform: 'translateY(0)', opacity: '1' } }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: "Pretendard", sans-serif;
+      background: #F5F7FA;
+      margin: 0;
+      padding: 0;
+    }
+    .btn-press:active { transform: scale(0.96); transition: transform 0.1s; }
+    .btn-press:hover { opacity: 0.9; }
+    @media (min-width: 768px) {
+      .btn-press:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    }
+  </style>
+</head>
+
+<body class="bg-[#F5F7FA] text-gray-900 leading-relaxed">
+
+  <!-- HERO -->
+  <section class="bg-gradient-to-b from-white to-[#EEF2FA] px-6 md:px-12 pt-16 pb-12 rounded-b-[2rem] shadow-sm">
+    <div class="max-w-5xl mx-auto">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="text-2xl tracking-tight flex items-baseline">
+          <span class="font-['Russo_One'] text-brand-dark">AD</span>
+          <span class="font-['Russo_One'] text-brand-light">vis</span>
+          <span class="font-['Righteous'] text-brand-light text-3xl -ml-0.5">e</span>
+          <span class="font-['Russo_One'] text-brand-light">r</span>
+        </div>
+        <span class="bg-yellow-50 text-yellow-600 text-[10px] font-bold px-2.5 py-1 rounded-full border border-yellow-100">
+          AI 솔루션
+        </span>
+      </div>
+      <h1 class="text-4xl md:text-5xl font-black mb-6 leading-tight animate-fade-in">
+        수익성 개선을 위한<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#7C8AFF] to-brand-main">AI 맞춤 솔루션</span>
+      </h1>
+      <p class="text-gray-600 max-w-3xl text-lg leading-relaxed animate-slide-up">
+        현재 <b class="text-brand-main">ROAS 342%</b>, <b class="text-brand-main">CTR 2.1%</b>, <b class="text-brand-main">CVR 5.1%</b>의 마케팅 성과를
+        <b class="text-brand-main">AI 기반 데이터 분석</b>으로 진단하고,<br>
+        노출 → 클릭 → 전환 퍼널 최적화를 통한 바로 실행 가능한 개선 전략을 제안합니다.
+      </p>
+    </div>
+  </section>
+
+  <!-- 솔루션 개요 -->
+  <section class="max-w-5xl mx-auto px-6 md:px-12 py-14">
+    <div class="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-sm animate-fade-in">
+      <div class="flex items-center gap-2 mb-6">
+        <i data-lucide="file-text" class="w-6 h-6 text-brand-main"></i>
+        <h2 class="text-2xl font-black text-gray-900">솔루션 개요</h2>
+      </div>
+
+      <div class="bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-100 rounded-2xl p-5 mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <i data-lucide="alert-triangle" class="w-5 h-5 text-red-500"></i>
+          <h3 class="font-bold text-gray-900">시장 상황 및 과제</h3>
+        </div>
+        <ul class="list-none space-y-2 text-gray-700">
+          <li class="flex items-start gap-2">
+            <i data-lucide="x-circle" class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0"></i>
+            <span>대형 프랜차이즈 진입으로 인한 고객 이탈 및 <b class="text-red-600">광고 경쟁 심화</b></span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="x-circle" class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0"></i>
+            <span>원자재 가격 상승에 따른 수익성 악화 및 <b class="text-red-600">마케팅 예산 효율성 저하</b></span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="x-circle" class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0"></i>
+            <span>노출 → 클릭 → 전환 퍼널에서 <b class="text-red-600">클릭 단계 병목 현상</b> 발생</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="x-circle" class="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0"></i>
+            <span>채널별 성과 분석 부재로 <b class="text-red-600">비효율적 예산 배분</b></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-100 rounded-2xl p-5">
+        <div class="flex items-center gap-2 mb-3">
+          <i data-lucide="target" class="w-5 h-5 text-green-600"></i>
+          <h3 class="font-bold text-gray-900">정량적 목표 (3개월)</h3>
+        </div>
+        <ul class="list-none space-y-2 text-gray-700">
+          <li class="flex items-start gap-2">
+            <i data-lucide="trending-up" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+            <span>월 매출 <b class="text-green-600">15% 상승</b></span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="mouse-pointer-2" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+            <span>클릭률(CTR) <b class="text-green-600">2.1% → 3.5%</b> 개선</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="shopping-bag" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+            <span>전환율(CVR) <b class="text-green-600">5% → 8%</b> 향상</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="bar-chart-2" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+            <span>ROAS <b class="text-green-600">342% → 450%</b> 달성</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="trending-down" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+            <span>AI 수요 예측 기반 식자재 폐기 비용 <b class="text-green-600">20% 절감</b></span>
+          </li>
+          <li class="flex items-start gap-2">
+            <i data-lucide="users" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+            <span>단골 고객 재방문율 <b class="text-green-600">25% 향상</b></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 현황 진단 -->
+  <section class="max-w-5xl mx-auto px-6 md:px-12 py-14">
+    <div class="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-sm animate-fade-in">
+      <div class="flex items-center gap-2 mb-6">
+        <i data-lucide="brain-circuit" class="w-6 h-6 text-brand-main"></i>
+        <h2 class="text-2xl font-black text-gray-900">현황 진단 및 데이터 분석</h2>
+      </div>
+
+      <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 mb-8">
+        <p class="text-xs text-gray-500 font-medium">
+          <i data-lucide="code" class="w-3 h-3 inline"></i> 분석 도구: Python 기반 시계열 분석 · 고객 리뷰 감성 분석 (Sentiment Analysis)
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-100 rounded-2xl p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="thumbs-up" class="w-5 h-5 text-green-600"></i>
+            <h3 class="font-bold text-gray-900">강점 (Strength)</h3>
+          </div>
+          <ul class="list-none space-y-2 text-gray-700">
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+              <span>직접 로스팅한 원두의 높은 품질</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+              <span>20대 단골층의 높은 충성도</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="check-circle" class="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0"></i>
+              <span>SNS 확산에 유리한 인테리어</span>
+            </li>
+          </ul>
+        </div>
+        <div class="bg-gradient-to-br from-yellow-50 to-orange-50 border-2 border-yellow-100 rounded-2xl p-5">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="alert-circle" class="w-5 h-5 text-yellow-600"></i>
+            <h3 class="font-bold text-gray-900">약점 (Weakness)</h3>
+          </div>
+          <ul class="list-none space-y-2 text-gray-700">
+            <li class="flex items-start gap-2">
+              <i data-lucide="mouse-pointer-2" class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0"></i>
+              <span>클릭률(CTR) 2.1%로 동종업계 평균(3.0%) 대비 <b class="text-red-600">30% 낮음</b></span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="bar-chart-2" class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0"></i>
+              <span>ROAS 342%로 동종업계 평균(420%) 대비 <b class="text-red-600">18% 낮음</b></span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0"></i>
+              <span>피크 타임(12~14시) 대기 시간 증가</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="cloud-off" class="w-4 h-4 text-yellow-600 mt-0.5 flex-shrink-0"></i>
+              <span>요일/날씨 기반 수요 예측 부재</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 마케팅 퍼널 분석 -->
+      <div class="bg-white border-2 border-gray-200 rounded-2xl p-6 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="funnel" class="w-5 h-5 text-brand-main"></i>
+          <h3 class="font-bold text-gray-900">마케팅 퍼널 분석</h3>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-blue-50 rounded-xl border border-blue-100">
+            <div class="flex items-center gap-2">
+              <i data-lucide="eye" class="w-4 h-4 text-blue-600"></i>
+              <span class="text-sm font-bold text-gray-700">노출수 (Impression)</span>
+            </div>
+            <span class="text-lg font-black text-brand-main">45,200</span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-purple-50 rounded-xl border-2 border-purple-200 relative">
+            <div class="absolute left-0 top-0 bottom-0 w-1 bg-red-500 rounded-l-xl"></div>
+            <div class="flex items-center gap-2 pl-1">
+              <i data-lucide="mouse-pointer-2" class="w-4 h-4 text-purple-600"></i>
+              <span class="text-sm font-bold text-purple-700">클릭수 (Click)</span>
+            </div>
+            <div class="text-right">
+              <span class="text-lg font-black text-purple-600 block">950</span>
+              <span class="text-[10px] text-red-500 font-bold">CTR: 2.1% (평균 하회)</span>
+            </div>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-green-50 rounded-xl border border-green-100">
+            <div class="flex items-center gap-2">
+              <i data-lucide="shopping-bag" class="w-4 h-4 text-green-600"></i>
+              <span class="text-sm font-bold text-gray-700">전환수 (Conversion)</span>
+            </div>
+            <div class="text-right">
+              <span class="text-lg font-black text-green-600 block">48</span>
+              <span class="text-[10px] text-gray-500 font-bold">CVR: 5.1%</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-xl">
+          <p class="text-xs text-gray-700 leading-relaxed">
+            <i data-lucide="alert-circle" class="w-3 h-3 inline text-yellow-600"></i>
+            <b class="text-yellow-700">병목 지점:</b> 노출은 충분하나 클릭으로 이어지지 않음. 
+            현재 클릭률(CTR) 2.1%는 동종업계 평균(3.0%) 대비 <b class="text-red-600">30% 낮음</b>.
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl p-6 relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-brand-main opacity-5 rounded-full blur-2xl transform translate-x-10 -translate-y-10"></div>
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="sparkles" class="w-5 h-5 text-purple-600"></i>
+            <h3 class="font-bold text-gray-900">AI 진단 결과</h3>
+          </div>
+          <ul class="list-none space-y-2 text-gray-800">
+            <li class="flex items-start gap-2">
+              <i data-lucide="bar-chart-3" class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0"></i>
+              <span>현재 ROAS <b class="text-purple-600">342%</b>로 동종업계 평균(420%) 대비 <b class="text-red-600">18% 낮음</b></span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="mouse-pointer-2" class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0"></i>
+              <span>배달의민족 채널 클릭률 <b class="text-purple-600">1.8%</b>, 네이버 플레이스 <b class="text-green-600">3.2%</b>로 채널 간 편차 큼</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="thermometer" class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0"></i>
+              <span>기온 25℃ 이상 시 아이스 음료 주문 급증 (전환율 +15%)</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="message-square" class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0"></i>
+              <span>리뷰 분석 결과, '디저트 종류 부족' 부정 응답 <b class="text-purple-600">30%</b></span>
+            </li>
+            <li class="flex items-start gap-2">
+              <i data-lucide="clock" class="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0"></i>
+              <span>금요일 저녁 시간대 노출수 대비 클릭 전환율이 <b class="text-green-600">평균 대비 25% 높음</b></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Action Plan -->
+  <section class="max-w-5xl mx-auto px-6 md:px-12 py-14">
+    <div class="bg-white p-6 md:p-8 rounded-[2rem] border border-gray-100 shadow-sm animate-fade-in">
+      <div class="flex items-center gap-2 mb-8">
+        <i data-lucide="zap" class="w-6 h-6 text-brand-main"></i>
+        <h2 class="text-2xl font-black text-gray-900">핵심 개선 과제 (Action Plan)</h2>
+      </div>
+
+      <div class="space-y-6">
+        <div class="bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-100 rounded-2xl p-6 hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-brand-main opacity-5 rounded-full blur-2xl transform translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform"></div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-brand-main rounded-full flex items-center justify-center text-white font-bold shadow-lg">1</div>
+              <h3 class="font-bold text-lg text-gray-900">
+                마케팅 최적화 – 클릭률(CTR) 및 전환율(CVR) 개선
+              </h3>
+            </div>
+            <div class="space-y-3 text-gray-700">
+              <div class="flex items-start gap-2">
+                <i data-lucide="arrow-right" class="w-4 h-4 text-brand-main mt-1 flex-shrink-0"></i>
+                <div>
+                  <p class="leading-relaxed mb-2">
+                    <b class="text-brand-main">노출 → 클릭 최적화:</b> AI 분석을 통해 '카페 투어족'과 '인근 대학생'을 타겟으로
+                    지역 맞춤 광고를 집행. 대표 메뉴 썸네일 고화질 교체 및 '인기' 배지 설정으로 
+                    <b class="text-green-600">CTR 2.1% → 3.5%</b> 목표.
+                  </p>
+                  <p class="leading-relaxed mb-2">
+                    <b class="text-brand-main">클릭 → 전환 최적화:</b> 매주 금요일 신메뉴 알림과 재방문 쿠폰을 자동 발송하여
+                    <b class="text-green-600">CVR 5.1% → 8.0%</b> 향상 목표.
+                  </p>
+                  <div class="bg-white/60 rounded-lg p-3 mt-2 border border-blue-200">
+                    <p class="text-xs font-bold text-gray-600 mb-1">📊 예상 성과</p>
+                    <p class="text-xs text-gray-700">
+                      노출수 45,200 기준 → 클릭수 950 → 1,582 (+66%), 전환수 48 → 127 (+164%)
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-100 rounded-2xl p-6 hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-green-500 opacity-5 rounded-full blur-2xl transform translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform"></div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">2</div>
+              <h3 class="font-bold text-lg text-gray-900">
+                채널별 ROAS 최적화 및 운영 효율화
+              </h3>
+            </div>
+            <div class="space-y-3 text-gray-700">
+              <div class="flex items-start gap-2">
+                <i data-lucide="arrow-right" class="w-4 h-4 text-green-600 mt-1 flex-shrink-0"></i>
+                <div>
+                  <p class="leading-relaxed mb-2">
+                    <b class="text-green-600">채널별 성과 분석:</b> 배달의민족(ROAS 256%), 네이버 플레이스(ROAS 420%), 
+                    쿠팡이츠(ROAS 180%) 등 채널별 효율 차이 분석 후 예산 재배분.
+                  </p>
+                  <p class="leading-relaxed mb-2">
+                    <b class="text-green-600">AI 기반 재고 관리:</b> 날씨 데이터와 연동된 수요 예측 모델로
+                    원두·우유 발주 가이드를 제공하고, 피크 타임 기준 유동적 인력 스케줄링을 적용하여
+                    <b class="text-green-600">ROAS 342% → 450%</b> 달성 목표.
+                  </p>
+                  <div class="bg-white/60 rounded-lg p-3 mt-2 border border-green-200">
+                    <p class="text-xs font-bold text-gray-600 mb-1">📊 채널별 개선 전략</p>
+                    <p class="text-xs text-gray-700">
+                      저효율 채널(인스타그램 광고) 예산 30% 감소 → 고효율 채널(네이버 플레이스) 집중 투자
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-100 rounded-2xl p-6 hover:shadow-md transition-shadow relative overflow-hidden group">
+          <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500 opacity-5 rounded-full blur-2xl transform translate-x-10 -translate-y-10 group-hover:scale-110 transition-transform"></div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold shadow-lg">3</div>
+              <h3 class="font-bold text-lg text-gray-900">
+                고객 경험 개선 – 전환율(CVR) 향상 및 재방문율 증가
+              </h3>
+            </div>
+            <div class="space-y-3 text-gray-700">
+              <div class="flex items-start gap-2">
+                <i data-lucide="arrow-right" class="w-4 h-4 text-purple-600 mt-1 flex-shrink-0"></i>
+                <div>
+                  <p class="leading-relaxed mb-2">
+                    <b class="text-purple-600">디지털 로열티 프로그램:</b> 노션 대시보드 기반 CRM을 구축하여
+                    고객별 선호 데이터를 축적하고, 태블릿 피드백 시스템으로 불만을 즉각 반영.
+                  </p>
+                  <p class="leading-relaxed mb-2">
+                    <b class="text-purple-600">리뷰 개선 전략:</b> '디저트 종류 부족' 피드백 반영하여 신메뉴 개발,
+                    AI 답글 생성 시스템으로 리뷰 응답률 향상으로 <b class="text-green-600">재방문율 25% 향상</b> 목표.
+                  </p>
+                  <div class="bg-white/60 rounded-lg p-3 mt-2 border border-purple-200">
+                    <p class="text-xs font-bold text-gray-600 mb-1">📊 전환 최적화 효과</p>
+                    <p class="text-xs text-gray-700">
+                      클릭수 1,582 기준 → 전환수 48 → 127 (+164%), 평균 주문금액 15,000원 기준 월 매출 +15% 예상
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 채널별 성과 비교 -->
+      <div class="mt-8 bg-white border-2 border-gray-200 rounded-2xl p-6">
+        <div class="flex items-center gap-2 mb-4">
+          <i data-lucide="bar-chart-3" class="w-5 h-5 text-brand-main"></i>
+          <h3 class="font-bold text-gray-900">채널별 성과 비교 및 개선 전략</h3>
+        </div>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-4 bg-red-50 border-2 border-red-100 rounded-xl">
+            <div class="flex items-center gap-3">
+              <i data-lucide="instagram" class="w-5 h-5 text-red-500"></i>
+              <div>
+                <p class="font-bold text-gray-900">인스타그램 광고</p>
+                <p class="text-xs text-gray-600">ROAS 180% · CTR 1.2%</p>
+              </div>
+            </div>
+            <span class="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg">중단 권장</span>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-yellow-50 border-2 border-yellow-100 rounded-xl">
+            <div class="flex items-center gap-3">
+              <i data-lucide="smartphone" class="w-5 h-5 text-yellow-600"></i>
+              <div>
+                <p class="font-bold text-gray-900">배달의민족</p>
+                <p class="text-xs text-gray-600">ROAS 256% · CTR 1.8%</p>
+              </div>
+            </div>
+            <span class="bg-yellow-400 text-white text-xs font-bold px-3 py-1.5 rounded-lg">보완 필요</span>
+          </div>
+          <div class="flex items-center justify-between p-4 bg-green-50 border-2 border-green-100 rounded-xl">
+            <div class="flex items-center gap-3">
+              <i data-lucide="map-pin" class="w-5 h-5 text-green-600"></i>
+              <div>
+                <p class="font-bold text-gray-900">네이버 플레이스</p>
+                <p class="text-xs text-gray-600">ROAS 420% · CTR 3.2%</p>
+              </div>
+            </div>
+            <span class="bg-green-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg">유지 및 확대</span>
+          </div>
+        </div>
+        <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+          <p class="text-xs text-gray-700 leading-relaxed">
+            <i data-lucide="lightbulb" class="w-3 h-3 inline text-blue-600"></i>
+            <b class="text-blue-700">예산 재배분 권장:</b> 저효율 채널(인스타그램) 예산의 30%를 고효율 채널(네이버 플레이스)로 이동 시
+            전체 ROAS <b class="text-green-600">+15%</b> 예상 효과.
+          </p>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="max-w-5xl mx-auto px-6 md:px-12 py-10 border-t border-gray-200">
+    <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 text-center">
+      <div class="flex items-center justify-center gap-2 mb-2">
+        <i data-lucide="info" class="w-4 h-4 text-gray-400"></i>
+        <p class="text-xs text-gray-500 font-medium">
+          * 본 내용은 예시 기반의 AI 분석 시나리오이며, 실제 결과는 업종·데이터 상황에 따라 달라질 수 있습니다.
+        </p>
+      </div>
+      <p class="text-[10px] text-gray-400 mt-4">© 2024 ADviser. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>
